@@ -65,6 +65,8 @@ def make_env(env_id, env_type, mpi_rank=0, subrank=0, seed=None, reward_scale=1.
 
     wrapper_kwargs = wrapper_kwargs or {}
     env_kwargs = env_kwargs or {}
+    env_kwargs['worker_id'] = subrank
+    
     if ':' in env_id:
         import re
         import importlib
@@ -77,8 +79,6 @@ def make_env(env_id, env_type, mpi_rank=0, subrank=0, seed=None, reward_scale=1.
         import retro
         gamestate = gamestate or retro.State.DEFAULT
         env = retro_wrappers.make_retro(game=env_id, max_episode_steps=10000, use_restricted_actions=retro.Actions.DISCRETE, state=gamestate)
-    elif env_type == 'custom':
-        env = gym.make(env_id, **kwargs)
     else:
         env = gym.make(env_id, **env_kwargs)
 
