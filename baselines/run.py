@@ -77,6 +77,7 @@ def train(args, extra_args):
         env=env,
         seed=seed,
         total_timesteps=total_timesteps,
+        gamma=0.98,
         **alg_kwargs
     )
 
@@ -112,7 +113,7 @@ def build_env(args):
         flatten_dict_observations = alg not in {'her'}
         env = make_vec_env(env_id, env_type, args.num_env or 1, seed, reward_scale=args.reward_scale, flatten_dict_observations=flatten_dict_observations)
 
-        if env_type in ['mujoco', 'custom']:
+        if env_type in ['mujoco']:
             env = VecNormalize(env)
 
     return env
