@@ -6,6 +6,7 @@ import gym
 from collections import defaultdict
 import tensorflow as tf
 import numpy as np
+import datetime
 
 from baselines.common.vec_env import VecFrameStack, VecNormalize, VecEnv
 from baselines.common.vec_env.vec_video_recorder import VecVideoRecorder
@@ -77,7 +78,8 @@ def train(args, extra_args):
         env=env,
         seed=seed,
         total_timesteps=total_timesteps,
-        gamma=0.98,
+        #gamma=0.98,
+        #save_interval=1,
         **alg_kwargs
     )
 
@@ -183,14 +185,13 @@ def parse_cmdline_kwargs(args):
     convert a list of '='-spaced command-line arguments to a dictionary, evaluating python objects when possible
     '''
     def parse(v):
-
         assert isinstance(v, str)
         try:
             return eval(v)
         except (NameError, SyntaxError):
             return v
 
-    return {k: parse(v) for k,v in parse_unknown_args(args).items()}
+    return {k: parse(v) for k,v in parse_unknown_args(args).items()} 
 
 
 
@@ -203,7 +204,15 @@ def main(args):
 
     if MPI is None or MPI.COMM_WORLD.Get_rank() == 0:
         rank = 0
-        logger.configure()
+        if 'name' in extra_args.keys(): 
+            name = extra_args['name']
+            del extra_args['name']
+        else: name = datetime.datetime.now().strftime("openai-%Y-%m-%d-%H-%M-%S-%f")
+        if 'test' in unknown_args : name = 'test/' + name
+        logger.configure(dir='/home/showay/Desktop/rotorS_exps/RL/logs_tmp/' + name)
+        args.save_path += name + '.pt'
+        print('Save Path: %s' % args.save_path)
+
     else:
         logger.configure(format_strs=[])
         rank = MPI.COMM_WORLD.Get_rank()
