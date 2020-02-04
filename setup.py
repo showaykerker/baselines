@@ -31,7 +31,7 @@ setup(name='baselines',
       packages=[package for package in find_packages()
                 if package.startswith('baselines')],
       install_requires=[
-          'gym>=0.10.0, <1.0.0',
+          'gym>=0.15.4, <0.16.0',
           'scipy',
           'tqdm',
           'joblib',
@@ -44,7 +44,7 @@ setup(name='baselines',
       author='OpenAI',
       url='https://github.com/openai/baselines',
       author_email='gym@openai.com',
-      version='0.1.5')
+      version='0.1.6')
 
 
 # ensure there is some tensorflow build with version above 1.4

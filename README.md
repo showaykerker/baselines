@@ -1,4 +1,4 @@
-**Status:** Active (under active development, breaking changes may occur)
+**Status:** Maintenance (expect bug fixes and minor updates)
 
 <img src="data/logo.jpg" width=25% align="right" /> [![Build status](https://travis-ci.org/openai/baselines.svg?branch=master)](https://travis-ci.org/openai/baselines)
 
@@ -39,21 +39,24 @@ To activate a virtualenv:
 More thorough tutorial on virtualenvs and options can be found [here](https://virtualenv.pypa.io/en/stable/) 
 
 
+## Tensorflow versions
+The master branch supports Tensorflow from version 1.4 to 1.14. For Tensorflow 2.0 support, please use tf2 branch.
+
 ## Installation
 - Clone the repo and cd into it:
     ```bash
     git clone https://github.com/openai/baselines.git
     cd baselines
     ```
-- If you don't have TensorFlow installed already, install your favourite flavor of TensorFlow. In most cases, 
+- If you don't have TensorFlow installed already, install your favourite flavor of TensorFlow. In most cases, you may use
     ```bash 
-    pip install tensorflow-gpu # if you have a CUDA-compatible gpu and proper drivers
+    pip install tensorflow-gpu==1.14 # if you have a CUDA-compatible gpu and proper drivers
     ```
     or 
     ```bash
-    pip install tensorflow
+    pip install tensorflow==1.14
     ```
-    should be sufficient. Refer to [TensorFlow installation guide](https://www.tensorflow.org/install/)
+    to install Tensorflow 1.14, which is the latest version of Tensorflow supported by the master branch. Refer to [TensorFlow installation guide](https://www.tensorflow.org/install/)
     for more details. 
 
 - Install baselines package
@@ -98,6 +101,8 @@ python -m baselines.run --alg=deepq --env=PongNoFrameskip-v4 --num_timesteps=1e6
 ```
 
 ## Saving, loading and visualizing models
+
+### Saving and loading the model
 The algorithms serialization API is not properly unified yet; however, there is a simple method to save / restore trained models. 
 `--save_path` and `--load_path` command-line option loads the tensorflow state from a given path before training, and saves it after the training, respectively. 
 Let's imagine you'd like to train ppo2 on Atari Pong,  save the model and then later visualize what has it learnt.
@@ -111,8 +116,17 @@ python -m baselines.run --alg=ppo2 --env=PongNoFrameskip-v4 --num_timesteps=0 --
 
 *NOTE:* Mujoco environments require normalization to work properly, so we wrap them with VecNormalize wrapper. Currently, to ensure the models are saved with normalization (so that trained models can be restored and run without further training) the normalization coefficients are saved as tensorflow variables. This can decrease the performance somewhat, so if you require high-throughput steps with Mujoco and do not need saving/restoring the models, it may make sense to use numpy normalization instead. To do that, set 'use_tf=False` in [baselines/run.py](baselines/run.py#L116). 
 
-## Loading and vizualizing learning curves and other training metrics
-See [here](docs/viz/viz.ipynb) for instructions on how to load and display the training data. 
+### Logging and vizualizing learning curves and other training metrics
+By default, all summary data, including progress, standard output, is saved to a unique directory in a temp folder, specified by a call to Python's [tempfile.gettempdir()](https://docs.python.org/3/library/tempfile.html#tempfile.gettempdir).
+The directory can be changed with the `--log_path` command-line option.
+```bash
+python -m baselines.run --alg=ppo2 --env=PongNoFrameskip-v4 --num_timesteps=2e7 --save_path=~/models/pong_20M_ppo2 --log_path=~/logs/Pong/
+```
+*NOTE:* Please be aware that the logger will overwrite files of the same name in an existing directory, thus it's recommended that folder names be given a unique timestamp to prevent overwritten logs.
+
+Another way the temp directory can be changed is through the use of the `$OPENAI_LOGDIR` environment variable.
+
+For examples on how to load and display the training data, see [here](docs/viz/viz.ipynb).
 
 ## Subpackages
 
